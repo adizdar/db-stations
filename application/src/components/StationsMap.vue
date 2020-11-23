@@ -1,8 +1,5 @@
 <template>
-  <GoogleMapLoader
-    :mapConfig="mapConfig"
-    :apiKey="apiKey"
-  >
+  <GoogleMapLoader :mapConfig="mapConfig" :apiKey="apiKey">
     <template slot-scope="{ google, map }">
       <GoogleMapMarker
         v-for="marker in markers"
@@ -27,7 +24,7 @@ import { mapSettings } from "@/configuration/googleMapSettings";
 import GoogleMapLoader from "./google-maps/GoogleMapLoader";
 import GoogleMapMarker from "./google-maps/GoogleMapMarker";
 import GoogleMapPolygon from "./google-maps/GoogleMapPolygon";
-import StationsService from '@/services/stations'
+import StationsService from "@/services/stations";
 
 export default {
   name: "StationsMap",
@@ -42,6 +39,7 @@ export default {
       apiKey: process.env.VUE_APP_GOOGLE_MAPS_API_KEY,
       markers: null,
       lines: null,
+      defaultLocation: { lat: 50.11505, lng: 8.625609 },
     };
   },
 
@@ -49,34 +47,49 @@ export default {
     mapConfig() {
       return {
         ...mapSettings,
-        center: this.mapCenter,
+        center: this.defaultLocation,
       };
-    },
+    }
+  },
 
-    mapCenter() {
-      // TODO needs validation if no data is present
-      // Try to use user location
-      return { lat: 50.11505, lng: 8.625609 };
-    },
+  created() {
+    if (!("geolocation" in navigator)) {
+      console.warn("Geo location is not supported.");
+
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.defaultLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
   },
 
   mounted() {
-    let $vm = this;
+    StationsService.get()
+      .then((response) => {
+        this.lines = [];
+        this.markers = [];
 
-    StationsService.get().then(function(response) {
-      $vm.lines = [];
-      $vm.markers = [];
-      response.data.map(function(stations) {
-        $vm.lines.push({
-          id: stations.id,
-          path: stations.paths,
+        response.data.map((stations) => {
+          this.lines.push({
+            id: stations.id,
+            path: stations.paths,
+          });
+
+          stations.markers.map((marker) => {
+            this.markers.push(marker);
+          });
         });
-        stations.markers.map(function(marker) {
-          $vm.markers.push(marker);
-        });
+      })
+      .catch((error) => {
+        console.log(error);
       });
-    });
-  }
+  },
 };
 </script>
 
