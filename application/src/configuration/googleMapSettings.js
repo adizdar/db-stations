@@ -46,10 +46,10 @@ const LINE_PATH_CONFIG = {
 };
 
 const mapSettings = {
-  clickableIcons: false,
+  clickableIcons: true,
   streetViewControl: false,
-  panControlOptions: false,
-  mapTypeControl: false,
+  panControlOptions: true,
+  mapTypeControl: true,
   zoomControlOptions: {
     style: "SMALL"
   },
