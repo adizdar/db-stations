@@ -10,7 +10,4 @@ npm install
 
 # run in development mode
 npm run dev
-
-# run tests
-npm run test
 ```
