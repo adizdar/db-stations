@@ -15,13 +15,6 @@ export default class ExpressServer {
   constructor() {
     const root = path.normalize(`${__dirname}/../..`);
 
-    // TODO add validation via swagger
-    // const apiSpec = path.join(__dirname, 'api.yml');
-    // const validateResponses = !!(
-    //   process.env.OPENAPI_ENABLE_RESPONSE_VALIDATION &&
-    //   process.env.OPENAPI_ENABLE_RESPONSE_VALIDATION.toLowerCase() === 'true'
-    // );
-
     app.set('appPath', `${root}client`);
     app.use(cors());
     app.use(bodyParser.json({ limit: process.env.REQUEST_LIMIT || '100kb' }));
@@ -34,16 +27,6 @@ export default class ExpressServer {
     app.use(bodyParser.text({ limit: process.env.REQUEST_LIMIT || '100kb' }));
     app.use(cookieParser(process.env.SESSION_SECRET));
     app.use(Express.static(`${root}/public`));
-
-    // TODO add validation via swagger
-    // app.use(process.env.OPENAPI_SPEC || '/spec', Express.static(apiSpec));
-    // app.use(
-    //   OpenApiValidator.middleware({
-    //     apiSpec,
-    //     validateResponses,
-    //     ignorePaths: /.*\/spec(\/|$)/,
-    //   })
-    // );
   }
 
   router(routes) {
